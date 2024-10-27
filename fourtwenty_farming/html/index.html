@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <head>
+        <meta charset="utf-8">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link href="styles/global.css" rel="stylesheet">
+        <link href="styles/layout.css" rel="stylesheet">
+        <link href="styles/components.css" rel="stylesheet">
+        <link href="styles/modules.css" rel="stylesheet">
+        <link href="styles/utilities.css" rel="stylesheet">
+    </head>
+</head>
+<body>
+    <div class="container hidden fade-in">
+        <button class="close-button" onclick="closeUI()">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="header">
+            <div class="header-left">
+                <div class="location-icon">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <div>
+                    <h1 class="location-title" id="location-title">Verarbeitung</h1>
+                    <div class="location-subtitle" id="location-subtitle">Wähle ein Rezept zum Verarbeiten</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="recipes">
+                    <i class="fas fa-book"></i>
+                    <span>Rezepte</span>
+                </div>
+                <div class="tab" data-tab="orders">
+                    <i class="fas fa-tasks"></i>
+                    <span>Aktive Aufträge</span>
+                </div>
+            </div>
+        </div>
+        <div class="content-area">
+            <div class="sidebar">
+                <div class="filters">
+                    <h3 class="filter-title">Filter</h3>
+                    <div id="recipe-categories">
+                        <div class="filter-option active" data-category="all">
+                            <span>Alle Rezepte</span>
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="filter-option" data-category="craftable">
+                            <span>Herstellbar</span>
+                            <i class="fas fa-check hidden"></i>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="inventory-summary" style="margin-top: 30px;">
+                    <h3 class="filter-title">Dein Inventar</h3>
+                    <div id="inventory-list" class="inventory-items">
+                        <!-- Wird dynamisch mit Inventar-Items gefüllt -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div id="recipes-content" class="recipes-container">
+                    <div class="recipe-grid" id="recipe-grid">
+                        <!-- Wird dynamisch befüllt -->
+                    </div>
+                </div>
+
+                <div id="orders-content" class="orders-container hidden">
+                    <div class="active-orders" id="active-orders">
+                        <!-- Wird dynamisch befüllt -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="shortcut-hint">
+            <i class="fas fa-keyboard"></i>
+            <span>ESC zum Schließen</span>
+        </div>
+    </div>
+
+    <div class="modal" id="amount-modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Menge auswählen</h3>
+            <button class="close-button" onclick="closeModal()" style="position: relative; top: 0; right: 0;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-content">
+            <div id="recipe-preview" class="recipe-preview-container">
+                <!-- Wird dynamisch befüllt -->
+            </div>
+            
+            <div class="amount-controls">
+                <button class="amount-adjust" onclick="adjustAmount(-1)">-</button>
+                <input type="number" class="amount-input" id="amount-input" min="1" value="1">
+                <button class="amount-adjust" onclick="adjustAmount(1)">+</button>
+            </div>
+
+            <div class="resource-calculation" id="resource-calculation">
+                <!-- Wird dynamisch befüllt -->
+            </div>
+            
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
