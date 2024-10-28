@@ -97,7 +97,6 @@ class RecipeManager {
             </div>
         `;
     }
-
     /**
      * Create card header section
      * @param {Object} recipe - Recipe data
@@ -106,105 +105,113 @@ class RecipeManager {
      */
     createCardHeader(recipe, priceString) {
         return `
-            <div class="card-header">
-                <div class="recipe-icon">
-                    <i class="fas ${this.getRecipeIcon(recipe.label)}"></i>
-                </div>
-                <div class="recipe-info">
-                    <h3 class="recipe-title">${recipe.label}</h3>
-                    <div class="recipe-meta">
-                        <span class="recipe-category">
-                            <i class="fas fa-tag"></i>
-                            ${recipe.category}
-                        </span>
-                        <span class="recipe-duration">
-                            <i class="fas fa-clock"></i>
-                            ${recipe.time}s
-                        </span>
-                        <div class="price-tag ${recipe.price > 0 ? 'price-cost' : 'price-free'}">
-                            ${priceString}
-                        </div>
+            <div class="recipe-header">
+                <div class="recipe-title-section">
+                    <div class="recipe-icon">
+                        <i class="fas ${this.getRecipeIcon(recipe.label)}"></i>
                     </div>
+                    <h3 class="recipe-name">${recipe.label}</h3>
+                </div>
+                
+                <div class="recipe-meta">
+                    <span class="meta-tag category">
+                        <i class="fas fa-tag"></i>
+                        ${recipe.category}
+                    </span>
+                    <span class="meta-tag time">
+                        <i class="fas fa-clock"></i>
+                        ${recipe.time}s
+                    </span>
+                    <span class="meta-tag price ${recipe.price > 0 ? 'cost' : ''}">
+                        <i class="fas ${recipe.price > 0 ? 'fa-coins' : 'fa-gift'}"></i>
+                        ${priceString}
+                    </span>
                 </div>
             </div>
         `;
     }
+    
+    formatPrice(price) {
+        return price > 0 
+            ? `$${price.toLocaleString()}`
+            : LocaleManager.translate('free');
+    }
 
-    /**
+   /**
      * Create card body section
      * @param {Object} recipe - Recipe data
      * @param {Object} rewardInfo - Formatted reward information
      * @returns {string}
      */
-    createCardBody(recipe, rewardInfo) {
-        return `
-            <div class="card-body">
-                ${this.createRequirementsSection(recipe)}
-                ${this.createRewardSection(rewardInfo)}
+   createCardBody(recipe, rewardInfo) {
+    return `
+        <div class="card-body">
+            ${this.createRequirementsSection(recipe)}
+            ${this.createRewardSection(rewardInfo)}
+        </div>
+    `;
+}
+
+/**
+ * Create requirements section
+ * @param {Object} recipe - Recipe data
+ * @returns {string}
+ */
+createRequirementsSection(recipe) {
+    const requirementsList = recipe.requires.map(req => 
+        this.createRequirementItem(req)
+    ).join('');
+
+    return `
+        <div class="requirements-section">
+            <h4>${LocaleManager.translate('required_materials')}</h4>
+            <div class="requirements-list">
+                ${requirementsList}
             </div>
-        `;
-    }
+        </div>
+    `;
+}
 
-    /**
-     * Create requirements section
-     * @param {Object} recipe - Recipe data
-     * @returns {string}
-     */
-    createRequirementsSection(recipe) {
-        const requirementsList = recipe.requires.map(req => 
-            this.createRequirementItem(req)
-        ).join('');
+/**
+ * Create single requirement item
+ * @param {Object} requirement - Requirement data
+ * @returns {string}
+ */
+createRequirementItem(requirement) {
+    const itemData = AppState.playerInventory[requirement.item] || { 
+        count: 0, 
+        label: requirement.label 
+    };
+    const hasEnough = InventoryManager.hasItemInInventory(
+        requirement.item, 
+        requirement.amount
+    );
 
-        return `
-            <div class="requirements-section">
-                <h4>${LocaleManager.translate('required_materials')}</h4>
-                <div class="requirements-list">
-                    ${requirementsList}
-                </div>
-            </div>
-        `;
-    }
-
-    /**
-     * Create single requirement item
-     * @param {Object} requirement - Requirement data
-     * @returns {string}
-     */
-    createRequirementItem(requirement) {
-        const itemData = AppState.playerInventory[requirement.item] || { 
-            count: 0, 
-            label: requirement.label 
-        };
-        const hasEnough = InventoryManager.hasItemInInventory(
-            requirement.item, 
-            requirement.amount
-        );
-
-        return `
-            <div class="requirement-item ${hasEnough ? 'available' : 'unavailable'}">
-                <div class="requirement-content">
-                    <img src="nui://inventory/web/dist/assets/items/${requirement.item}.png" 
-                         alt="${requirement.label}" 
-                         class="item-image">
-                    <div class="requirement-details">
-                        <span class="requirement-label">${requirement.label}</span>
-                        <div class="requirement-amount">
-                            <span class="current">${itemData.count}</span>
-                            <span class="separator">/</span>
-                            <span class="required">${requirement.amount}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="requirement-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" 
-                             style="width: ${Math.min((itemData.count / requirement.amount) * 100, 100)}%">
-                        </div>
+    return `
+        <div class="requirement-item ${hasEnough ? 'available' : 'unavailable'}">
+            <div class="requirement-content">
+                <img src="nui://inventory/web/dist/assets/items/${requirement.item}.png" 
+                     alt="${requirement.label}" 
+                     class="item-image">
+                <div class="requirement-details">
+                    <span class="requirement-label">${requirement.label}</span>
+                    <div class="requirement-amount">
+                        <span class="current">${itemData.count}</span>
+                        <span class="separator">/</span>
+                        <span class="required">${requirement.amount}</span>
                     </div>
                 </div>
             </div>
-        `;
-    }
+            <div class="requirement-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" 
+                         style="width: ${Math.min((itemData.count / requirement.amount) * 100, 100)}%">
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
     /**
      * Create reward section
