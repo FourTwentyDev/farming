@@ -28,6 +28,23 @@
     gap: 10px;
 }
 
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(67, 56, 202, 0.4);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(67, 56, 202, 0.6);
+}
+
 .requirement-amount {
     background: rgba(255, 255, 255, 0.1);
     padding: 4px 8px;

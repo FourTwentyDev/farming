@@ -1,12 +1,53 @@
-local ESX = exports['es_extended']:getSharedObject()
-local isProcessing = false
-local activeOrders = {}
-local currentProcessor = nil
-local pendingOrderId = nil
+-- client.lua
+print("^2[DEBUG] Client script starting^7")
 
--- Blips erstellen
+local ESX = nil
+print('^2[FARMING] Client script loading...^7')
+
+local ESX = exports['es_extended']:getSharedObject()
+
+-- Test Command
+RegisterCommand('farmtest', function(source, args)
+    print('^2[FARMING] Test command executed^7')
+    ESX.ShowNotification('Farming test command executed!')
+end, false)
+
+-- Basic Event Handler
+RegisterNetEvent('esx:playerLoaded')
+AddEventHandler('esx:playerLoaded', function(xPlayer)
+    print('^2[FARMING] Player loaded^7')
+end)
+
 CreateThread(function()
+    while true do
+        print('^2[FARMING] Thread running^7')
+        Wait(10000) -- Print alle 10 Sekunden
+    end
+end)
+-- ESX laden mit Debug
+CreateThread(function()
+    print("^2[DEBUG] Waiting for ESX^7")
+    ESX = exports['es_extended']:getSharedObject()
+    print("^2[DEBUG] ESX loaded^7")
+end)
+
+-- Blips erstellen mit Debug
+CreateThread(function()
+    Wait(2000) -- Warte bis ESX und alles andere geladen ist
+    print("^2[DEBUG] Starting Blip creation^7")
+    
+    if not Config then
+        print("^1[ERROR] Config is nil!^7")
+        return
+    end
+    
+    if not Config.FarmingSpots then
+        print("^1[ERROR] Config.FarmingSpots is nil!^7")
+        return
+    end
+    
     for k, v in pairs(Config.FarmingSpots) do
+        print("^3[DEBUG] Creating blip for farming spot: " .. k .. "^7")
         local blip = AddBlipForCoord(v.coords)
         SetBlipSprite(blip, 514)
         SetBlipColour(blip, 2)
@@ -16,7 +57,13 @@ CreateThread(function()
         EndTextCommandSetBlipName(blip)
     end
     
+    if not Config.ProcessingSpots then
+        print("^1[ERROR] Config.ProcessingSpots is nil!^7")
+        return
+    end
+    
     for k, v in pairs(Config.ProcessingSpots) do
+        print("^3[DEBUG] Creating blip for processing spot: " .. k .. "^7")
         local blip = AddBlipForCoord(v.coords)
         SetBlipSprite(blip, v.blip.sprite)
         SetBlipColour(blip, v.blip.color)
@@ -25,14 +72,23 @@ CreateThread(function()
         AddTextComponentString(v.label)
         EndTextCommandSetBlipName(blip)
     end
+    print("^2[DEBUG] Finished creating blips^7")
 end)
 
--- Farming Loop
+-- Farming Loop mit Debug
 CreateThread(function()
+    Wait(2000)
+    print("^2[DEBUG] Starting farming loop^7")
     while true do
         local sleep = 1000
         local playerPed = PlayerPedId()
         local playerCoords = GetEntityCoords(playerPed)
+        
+        if not Config or not Config.FarmingSpots then
+            print("^1[ERROR] Config or FarmingSpots missing in farming loop^7")
+            Wait(sleep)
+            return
+        end
         
         for k, v in pairs(Config.FarmingSpots) do
             local distance = #(playerCoords - v.coords)
@@ -148,6 +204,8 @@ end
 
 RegisterNetEvent('farming:receiveRecipeLabels')
 AddEventHandler('farming:receiveRecipeLabels', function(labeledRecipes)
+    local currentLocale = GetLocale()
+    
     SendNUIMessage({
         type = 'showUI',
         recipes = labeledRecipes,
@@ -156,12 +214,12 @@ AddEventHandler('farming:receiveRecipeLabels', function(labeledRecipes)
             label = Config.ProcessingSpots[currentProcessor].label,
             allowedRecipes = Config.ProcessingSpots[currentProcessor].allowedRecipes
         },
+        translations = Locales[currentLocale], -- Sende alle Übersetzungen der aktuellen Sprache
         inventory = GetFormattedInventory()
     })
     
     TriggerServerEvent('farming:getActiveOrders')
 end)
-
 RegisterNetEvent('farming:updateActiveOrders')
 AddEventHandler('farming:updateActiveOrders', function(orders)
     activeOrders = orders

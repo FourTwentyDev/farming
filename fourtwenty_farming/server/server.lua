@@ -1,5 +1,4 @@
 ESX = exports["es_extended"]:getSharedObject()
-
 CreateThread(function()
     MySQL.query([[
         CREATE TABLE IF NOT EXISTS crafting_orders (

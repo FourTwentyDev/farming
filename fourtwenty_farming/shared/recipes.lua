@@ -2,12 +2,17 @@
 Recipes = {}
 
 Recipes.List = {
-    ["flour"] = {
-        label = "Aus DJ wird Kokain Bruda",
+    ["burger"] = {
+        label = "Burger",
         time = 20,
         price = 1500, -- Kostet 1500$
         requires = {
-            {item = "ing_salad", amount = 3}
+            {item = "ing_salad", amount = 2},
+            {item = "ing_bread", amount = 1},
+            {item = "ing_meat", amount = 1},
+            {item = "ing_mustard", amount = 1},
+            {item = "ing_tomato", amount = 2},
+            {item = "ing_pickle", amount = 2},
         },
         rewards = {
             {item = "food_burger", amount = 1}

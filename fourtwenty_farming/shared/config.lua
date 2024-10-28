@@ -1,5 +1,7 @@
 Config = {}
 
+Config.Locale = 'en' -- or 'en', or custom created
+
 Config.FarmingSpots = {
     ["wheat"] = {
         label = "Weizen",
@@ -32,6 +34,6 @@ Config.ProcessingSpots = {
             sprite = 475,
             color = 21
         },
-        allowedRecipes = {"flour"} 
+        allowedRecipes = {"burger"} 
     }
 }

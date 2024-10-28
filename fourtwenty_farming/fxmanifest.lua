@@ -7,7 +7,8 @@ version '1.0.0'
 
 shared_scripts {
     'shared/config.lua',
-    'shared/recipes.lua'
+    'shared/recipes.lua',
+    'shared/locale.lua'
 }
 
 client_scripts {
@@ -24,8 +25,8 @@ ui_page 'html/index.html'
 
 files {
     'html/styles/*.css',
+    'html/js/*.js',
     'html/index.html',
-    'html/script.js',
 }
 
 dependencies {
