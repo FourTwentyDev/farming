@@ -1,51 +1,68 @@
 # FiveM Farming & Crafting System 🌾
+A sophisticated farming and crafting system featuring dynamic object spawning, smart resource collection, and a powerful crafting queue system with real-time NUI interface.
 
-A comprehensive farming and crafting system for FiveM servers featuring resource collection, processing spots, and a sophisticated crafting queue system.
+## Unique Features 🚀
 
-## Features 🚜
+### Advanced Resource Collection
+- **Dynamic Object System** 🌳
+  - Smart object spawning with ground detection
+  - Automatic object cleanup when players leave area
+  - Collision prevention between objects
+  - Individual object states and respawn timers
+  - Configurable spawn patterns and densities
+  - Visual object highlighting for collectable items
 
-- **Resource Collection**: 
-  - Multiple farming spots across the map
-  - Custom animations for gathering
-  - Configurable coordinates and resource types
-  - Blip system for easy location finding
+- **Multi-Mode Farming** 🎯
+  - Area-based collection zones with visual markers
+  - Individual collection points with specific coordinates
+  - Hybrid zones supporting both methods simultaneously
+  - Custom animation support per farming type
+  - Individual cooldown systems for each spot
 
-- **Processing Locations**: 
-  - Multiple processing spots for different crafting types
-  - Custom blips with different colors and sprites
-  - Location-specific recipe lists
-  - Visual markers for easy identification
+### Smart Processing System 🏭
+- **Location-Based Processing**
+  - Different recipes per location type
+  - Processor-specific crafting restrictions
+  - Custom marker and blip configurations
   - Distance-based interaction system
 
-- **Advanced Crafting System**: 
-  - Recipe-based crafting with multiple ingredients
-  - Category-based recipe filtering
-  - Real-time crafting progress
-  - Queue system for multiple orders
-  - Visual progress tracking
-  - Custom crafting durations
-  - Resource validation
-  - Price system for recipes
+- **Advanced Queuing System**
+  - Multiple orders per player
+  - Real-time order progress tracking
+  - Order persistence through server restarts
+  - Automatic cleanup of old orders
+  - Partial refund system for cancellations
 
-- **Modern UI System**: 
-  - Dark themed interface
-  - Recipe cards with detailed information
-  - Real-time inventory tracking
-  - Progress bars for material requirements
-  - Dynamic order status updates
-  - Responsive design
+### Real-Time NUI Interface 💻
+- **Modern React-Based UI**
+  - Real-time inventory synchronization
+  - Dynamic recipe filtering system
+  - Live progress tracking
+  - Responsive design for all screen sizes
+  - Dark theme optimized for FiveM
 
-- **Inventory Management**: 
-  - Real-time inventory updates
-  - Item weight system integration
-  - Custom item labels
-  - Stack size validation
-  - Full ESX integration
+- **Smart Resource Management**
+  - Live inventory checks
+  - Real-time material requirement updates
+  - Dynamic crafting button states
+  - Visual feedback for all actions
+
+### Additional Advanced Features
+- **Multi-Language Support** 🌍
+  - Full support for English, German and Russian
+  - Easy addition of new languages
+  - Dynamic language switching
+  - Server-side locale configuration
+
+- **Performance Optimization** ⚡
+  - Smart distance checks
+  - Efficient object spawning
+  - Optimized database queries
+  - Minimal resource usage
 
 ## Dependencies 📦
-
-- ESX Framework
-- MySQL-Async or OxMySQL
+- [es_extended](https://github.com/esx-framework/esx-legacy)
+- [oxmysql](https://github.com/overextended/oxmysql) or mysql-async
 - FiveM Server Build 2802 or higher
 
 ## Installation 💿
@@ -55,97 +72,180 @@ A comprehensive farming and crafting system for FiveM servers featuring resource
 cd resources
 git clone https://github.com/FourTwentyDev/farming
 ```
-2. Import the included SQL file to your database
+
+2. Import the included SQL file
 ```bash
 mysql -u your_username -p your_database < farming.sql
 ```
-3. Add `ensure fourtwenty_farming` to your `server.cfg`
-4. Configure the script using the `config.lua` file
 
-## Configuration 🔧
-
-### Farming Spots Configuration
+3. Add to your `server.cfg`
 ```lua
-Config.FarmingSpots = {
-    wheat = {
-        coords = vector3(x, y, z),
-        label = "Wheat Field",
-        animation = "WORLD_HUMAN_GARDENER_PLANT",
-        blip = {sprite = 514, color = 2}
-    }
-}
+ensure farming
 ```
 
-### Processing Spots Configuration
-```lua
-Config.ProcessingSpots = {
-    bakery = {
-        coords = vector3(x, y, z),
-        label = "Bakery",
-        blip = {sprite = 536, color = 46},
-        allowedRecipes = {"bread", "cake", "pastry"}
-    }
-}
-```
+## Detailed Configuration 🔧
 
-### Recipe Configuration
+### Dynamic Farming Example
 ```lua
-Recipes.List = {
-    bread = {
-        label = "Fresh Bread",
-        category = "bakery",
-        time = 30,
-        price = 50,
-        requires = {
-            {item = "flour", amount = 2},
-            {item = "water", amount = 1}
+FarmingConfig.DynamicSpots = {
+    apple_orchard = {
+        enabled = true,
+        label = "Apple Orchard",
+        coords = vector3(-1790.75, 2214.36, 89.43),
+        objects = {
+            model = "prop_apple_01",
+            amount = 15,            -- Spawn 15 apple trees
+            radius = 25.0,         -- In a 25.0 unit radius
+            minDistance = 3.0,     -- Minimum 3.0 units between trees
+            groundOffset = 0.2,    -- Slight offset from ground
+            respawnTime = 300      -- 5 minutes respawn time
         },
-        rewards = {
-            {item = "bread", amount = 1}
+        collection = {
+            radius = 2.0,          -- Collection radius around each tree
+            animation = {
+                dict = "mini@repair",
+                anim = "fixing_a_ped",
+                flag = 49,
+                duration = 5000
+            }
+        },
+        reward = {
+            item = "apple",
+            amount = {min = 1, max = 3},  -- Random amount between 1-3
+            chance = 85                   -- 85% success chance
         }
     }
 }
 ```
 
-## Database Structure 📚
+### Processing Location Example
+```lua
+ProcessingConfig.Locations = {
+    bakery_central = {
+        enabled = true,
+        label = "Downtown Bakery",
+        coords = vector3(382.89, -993.24, 29.42),
+        blip = {
+            sprite = 536,
+            color = 46,
+            scale = 0.8
+        },
+        marker = {
+            type = 1,
+            size = {x = 1.5, y = 1.5, z = 1.0},
+            color = {r = 50, g = 200, b = 50, a = 100}
+        },
+        allowedRecipes = {"bread", "cake", "pastry"},
+        requirements = {
+            job = "baker",           -- Optional job requirement
+            item = "recipe_book"     -- Optional item requirement
+        }
+    }
+}
+```
 
-The script uses the following table structure:
+### Recipe Configuration Example
+```lua
+Recipes.List = {
+    artisan_bread = {
+        label = "Artisan Bread",
+        category = "bakery",
+        time = 180,                -- 3 minutes crafting time
+        price = 150,               -- Crafting cost
+        requires = {
+            {item = "premium_flour", amount = 3},
+            {item = "yeast", amount = 1},
+            {item = "salt", amount = 1},
+            {item = "water", amount = 2}
+        },
+        rewards = {
+            {item = "artisan_bread", amount = 2}
+        }
+    }
+}
+```
 
+## Database Design 📚
+The system uses a sophisticated database structure to track all farming and crafting activities:
+
+### Orders Table
 ```sql
 CREATE TABLE IF NOT EXISTS crafting_orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     player_identifier VARCHAR(50),
     recipe_name VARCHAR(50),
     amount INT,
-    start_time TIMESTAMP,
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completion_time TIMESTAMP,
-    collected BOOLEAN DEFAULT FALSE
+    collected BOOLEAN DEFAULT FALSE,
+    cancelled BOOLEAN DEFAULT FALSE,
+    refunded BOOLEAN DEFAULT FALSE,
+    INDEX idx_player_status (player_identifier, collected),
+    INDEX idx_completion (completion_time)
 );
 ```
 
-## Client Events 🎮
+### Farming Statistics
+```sql
+CREATE TABLE IF NOT EXISTS farming_stats (
+    player_identifier VARCHAR(50),
+    spot_id VARCHAR(50),
+    total_collected INT DEFAULT 0,
+    last_collection TIMESTAMP,
+    success_rate FLOAT DEFAULT 0.0,
+    PRIMARY KEY (player_identifier, spot_id)
+);
+```
 
-- `farming:craftingResult` - Triggered when crafting starts/fails
-- `farming:updateActiveOrders` - Updates the order list
-- `farming:receiveRecipeLabels` - Receives recipe data with labels
+## Advanced Usage Examples 🎮
 
-## Server Events 🖥️
+### Client Events
+```lua
+-- Start crafting with custom amount
+TriggerEvent('farming:startCrafting', 'artisan_bread', 5)
 
-- `farming:startCrafting` - Starts the crafting process
-- `farming:collectOrder` - Collects completed orders
-- `farming:getActiveOrders` - Retrieves active orders
-- `farming:giveItem` - Gives collected items to player
+-- Collect completed order
+TriggerEvent('farming:collectOrder', orderId)
 
-## Support 💡
+-- Update inventory display
+TriggerEvent('farming:updateInventory', {inventory = playerInventory})
+```
 
-For support, please:
+### Server Events
+```lua
+-- Give farming reward with chance calculation
+TriggerEvent('farming:giveReward', playerId, spotId, 'dynamic')
+
+-- Process recipe labels
+TriggerEvent('farming:getRecipeLabels', recipes)
+```
+
+### Exports Usage
+```lua
+-- Check if player is currently collecting
+local isCollecting = exports['farming']:getIsCollecting()
+
+-- Get all spawned objects in area
+local objects = exports['farming']:getSpawnedObjects()
+
+-- Get player's active orders
+local orders = exports['farming']:GetPlayerOrders(identifier)
+```
+
+## Support & Links 💡
 1. Join our [Discord](https://discord.gg/fourtwenty)
-2. Visit our website: [www.fourtwenty.dev](https://fourtwenty.dev)
-3. Create an issue on GitHub
+2. Visit [FourTwenty Development](https://fourtwenty.dev)
+3. Create an issue on [GitHub](https://github.com/FourTwentyDev/farming)
 
 ## License 📄
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-Made with ❤️ by [FourTwentyDev](https://fourtwenty.dev)
+Made with 💚 by [FourTwenty Development](https://fourtwenty.dev)
+
+### Latest Updates
+- Added Russian language support
+- Improved dynamic object spawning system
+- Enhanced order management system
+- Added detailed farming statistics
+- Implemented smart cooldown system
